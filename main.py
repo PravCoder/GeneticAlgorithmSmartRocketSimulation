@@ -33,6 +33,9 @@ def main():
         population.move()
         population.check_collisions(block1, block2, target)
 
+        if population.is_population_dead() == True:
+            population.create_new_generation()
+
         pygame.display.update()
 
 if __name__ == "__main__":
