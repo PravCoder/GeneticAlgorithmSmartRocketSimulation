@@ -9,9 +9,9 @@ GOLD = (255,185,15)
 BROWN = (184,134,11)
 GREY2 = (100,100,100)
 
-FPS = 60
 WIDTH = 700
-HEIGHT = 750        
+HEIGHT = 750 
+FPS = 60       
 ROCKET_WIDTH = 10
 ROCKET_HEIGHT = 20
 max_rocket_vel = 5
