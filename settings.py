@@ -14,6 +14,7 @@ WIDTH = 700
 HEIGHT = 750        
 ROCKET_WIDTH = 10
 ROCKET_HEIGHT = 20
+max_rocket_vel = 5
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 WIN.fill(GREY2)
