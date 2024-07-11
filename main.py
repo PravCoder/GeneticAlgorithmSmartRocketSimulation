@@ -1,9 +1,10 @@
 import pygame, sys, random
 from settings import FPS, WIDTH, HEIGHT, WIN,BLACK,GREEN,GREY,GREY2
 from rocket import Rocket
+from population import Population
 pygame.init()
 
-r1 = Rocket(pos=(350, 600))  
+population = Population(5, spawn_pos=(350, 600))
 
 def main():
     run = True
@@ -18,8 +19,8 @@ def main():
                 sys.exit()
 
         WIN.fill(GREY2)
-        r1.draw()
-        r1.move(vx=random.randint(0, 5), vy=random.randint(-5, 5))
+        population.draw_population()
+        population.move()
 
         pygame.display.update()
 

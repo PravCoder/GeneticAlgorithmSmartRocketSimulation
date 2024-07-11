@@ -11,9 +11,9 @@ GREY2 = (100,100,100)
 
 FPS = 60
 WIDTH = 700
-HEIGHT = 700        
-ROCKET_WIDTH = 30
-ROCKET_HEIGHT = 50
+HEIGHT = 750        
+ROCKET_WIDTH = 10
+ROCKET_HEIGHT = 20
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 WIN.fill(GREY2)
