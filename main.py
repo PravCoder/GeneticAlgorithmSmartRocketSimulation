@@ -6,7 +6,7 @@ from block import Block
 from target import Target
 pygame.init()
 
-population = Population(num_individuals=15, spawn_pos=(350, 600))
+population = Population(num_individuals=50, spawn_pos=(350, 700))
 block1 = Block(pos=(250,400), width=WIDTH-250, height=15)
 block2 = Block(pos=(0,150), width=300, height=15)
 target = Target(pos=(370, 20), width=50, height=50)
@@ -35,6 +35,7 @@ def main():
 
         if population.is_population_dead() == True:
             population.create_new_generation()
+            print(f"Genetion #{population.genetion_num}")
 
         pygame.display.update()
 

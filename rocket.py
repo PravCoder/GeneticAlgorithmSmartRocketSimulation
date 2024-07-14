@@ -1,4 +1,4 @@
-import pygame, math
+import pygame, math, random
 from settings import *
 
 class Rocket(pygame.sprite.Sprite):
@@ -17,6 +17,9 @@ class Rocket(pygame.sprite.Sprite):
         self.reached_target = False # true when collision with target
         self.collided_with_block = False  # for fitness calc
         self.went_out_of_bounds = False
+        self.collision_penalty = 10
+        self.genome_completion_penalty = 5
+        self.genome_completed = False
 
     def draw(self):
         pygame.draw.rect(WIN, self.color, self.rect)
@@ -28,6 +31,10 @@ class Rocket(pygame.sprite.Sprite):
             self.rect.x += pos[0]  # vx positive move right, negative move left
             self.rect.y += pos[1]  # vy positive move down, negative move up
             self.step += 1
+            if self.step >= len(self.genome)-1:
+                self.genome_completed = True
+        else:  # if the cur-step is more than genome length it is done
+            self.dead = True
 
 
     def is_out_of_bounds(self):
@@ -37,8 +44,33 @@ class Rocket(pygame.sprite.Sprite):
             return True
         return False
     
+    def is_done_steps(self):
+        if self.steps >= len(self.genome)-1:
+            return True
+        return False
+    
     def eval_fitness(self, target):
-        distance_to_target = math.sqrt((self.rect.x - target.rect.x) ** 2 + (self.rect.y - target.rect.y) ** 2)
-        self.fitness = 1 / (distance_to_target + 1)  # reward/increase fitness closer rocket is to target
-        if self.collided_with_block or self.went_out_of_bounds: self.fitness /= 2 # penalize/decrease fitness if rocket collision or out
-        print(f"fitness: {self.fitness}")
+        distance_to_target = math.sqrt((self.pos[0] - target.pos[0])**2 + (self.pos[1] - target.pos[1])**2)
+        
+        if self.collided_with_block or self.went_out_of_bounds:
+            self.fitness = 1 / (distance_to_target + 1) - self.collision_penalty
+        elif self.genome_completed:
+            self.fitness = 1 / (distance_to_target + 1) - self.genome_completion_penalty
+        else:
+            self.fitness = 1 / (distance_to_target + 1)
+
+        
+        if self.collided_with_block or self.went_out_of_bounds or self.genome_completed:
+            print(f"fitness: {self.fitness} - penalized")
+        else:
+            print(f"fitness: {self.fitness}")
+
+    def mutate(self, mutation_rate):
+        mutated_genome = []
+        for gene in self.genome:
+            if random.random() < mutation_rate:
+                mutated_gene = (gene[0] + random.uniform(-1, 1), gene[1] + random.uniform(-1, 1))
+            else:
+                mutated_gene = gene
+            mutated_genome.append(mutated_gene)
+        self.genome = mutated_genome

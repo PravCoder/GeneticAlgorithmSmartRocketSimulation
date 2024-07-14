@@ -7,9 +7,13 @@ class Population:
     def __init__(self, num_individuals, spawn_pos):
         self.num_individuals = num_individuals
         self.spawn_pos = spawn_pos
-        self.chromosomes = []  # individauls of current generation
+        self.chromosomes = []  # individauls of current generation, list of rocket-objs
         self.genome_length = 250
         self.create_population()
+        self.parent_rockets = [] # selected rockets to create offspring of this generation
+        self.tournament_size = 5
+        self.genetion_num = 1
+        self.mutation_rate = 0.05 
 
     def create_population(self):
         for _ in range(self.num_individuals):
@@ -28,8 +32,8 @@ class Population:
         genome = []
         for _ in range(self.genome_length): # for every element in genome add a random vector (vx, vy)
             # (vx, vy) vx positive move right, negative move left vy positive move down, negative move up
-            # genome.append((random.randint(-max_rocket_vel, max_rocket_vel), random.randint(-max_rocket_vel, max_rocket_vel)))
-            genome.append((random.randint(-max_rocket_vel, max_rocket_vel), random.randint(-max_rocket_vel, 0)))
+            genome.append((random.randint(-max_rocket_vel, max_rocket_vel), random.randint(-max_rocket_vel, max_rocket_vel)))
+            # genome.append((random.randint(-max_rocket_vel, max_rocket_vel), random.randint(-max_rocket_vel, 0)))
         return genome
     
 
@@ -38,23 +42,55 @@ class Population:
             if rocket.rect.colliderect(block1.rect) or rocket.rect.colliderect(block2.rect):
                 rocket.dead = True
                 rocket.collided_with_block = True # for fitness calculation
-                rocket.eval_fitness(target)
                 #print("Block collision!")
             if rocket.rect.colliderect(target.rect):
                 rocket.reached_target = True
-                rocket.eval_fitness(target)
                 #print("Target reached!")
             if rocket.is_out_of_bounds() == True:
                 rocket.dead = True
                 rocket.went_out_of_bounds = True
-                rocket.eval_fitness(target)
                 #print("Rocket out of bounds!")
+            if rocket.dead == True: rocket.eval_fitness(target)
+            
 
     def is_population_dead(self):
         for rocket in self.chromosomes:
             if rocket.dead == False:
                 return False
+        
         return True
     
-    def create_new_generation(self):
-        pass
+    def create_new_generation(self): 
+        self.genetion_num += 1
+        self.select_best_rockets()  # use tournament selection to select best rockets based on fitness
+        self.chromosomes = []  # clear the current population
+        for _ in range(self.num_individuals // 2):
+            parent1 = random.choice(self.parent_rockets)
+            parent2 = random.choice(self.parent_rockets)
+            offspring1, offspring2 = self.single_point_crossover(parent1, parent2)
+            
+            # offspring1.mutate(self.mutation_rate)
+            # offspring2.mutate(self.mutation_rate)
+
+            self.chromosomes.append(offspring1)
+            self.chromosomes.append(offspring2)
+
+
+    def select_best_rockets(self):
+        self.parent_rockets = [] # make sure parent rockets is clear
+        for _ in range(self.num_individuals):  # iterate size of population which will also be the number of parent rockest
+            self.parent_rockets.append(self.tournament_selection())
+
+    def tournament_selection(self):
+        tournament = random.sample(self.chromosomes, self.tournament_size) # from the population of rockets select a subet of rockets (tournament-size)
+        tournament.sort(key=lambda rocket: rocket.fitness, reverse=True) # sort them based on fitness and return the highest gitness rocket
+        return tournament[0]
+    
+    def single_point_crossover(self, parent1, parent2):
+        # choose parent with smaller genome?
+        crossover_point = random.randint(1, len(parent1.genome)-1) # choose random cross-point frmo indx-1 to last index in the parent1s genome
+        genome1 = parent1.genome[:crossover_point] + parent2.genome[crossover_point:] # take genomes of p1 before crossover-point, and combine it with genomes of p2 after crossover-point
+        genome2 = parent1.genome[crossover_point:] + parent2.genome[:crossover_point] #  take genomes of p1 after crossover-point, and combine it with genomes of p2 before crossover-point 
+        offspring1 = Rocket(pos=self.spawn_pos, genome=genome1)
+        offspring2 = Rocket(pos=self.spawn_pos, genome=genome2)
+        return offspring1, offspring2
