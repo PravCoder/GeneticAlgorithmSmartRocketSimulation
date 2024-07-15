@@ -50,20 +50,16 @@ class Rocket(pygame.sprite.Sprite):
         return False
     
     def eval_fitness(self, target):
-        distance_to_target = math.sqrt((self.pos[0] - target.pos[0])**2 + (self.pos[1] - target.pos[1])**2)
-        
-        if self.collided_with_block or self.went_out_of_bounds:
-            self.fitness = 1 / (distance_to_target + 1) - self.collision_penalty
-        elif self.genome_completed:
-            self.fitness = 1 / (distance_to_target + 1) - self.genome_completion_penalty
-        else:
-            self.fitness = 1 / (distance_to_target + 1)
+        distance_to_target = math.sqrt((self.rect.x - target.rect.x) ** 2 + (self.rect.y - target.rect.y) ** 2)
+        self.fitness = 1 / (distance_to_target + 1)  # reward/increase fitness closer rocket is to target
+        if self.reached_target: self.fitness += 5
+        if self.collided_with_block or self.went_out_of_bounds: self.fitness /= 2 # penalize/decrease fitness if rocket 
 
         
-        if self.collided_with_block or self.went_out_of_bounds or self.genome_completed:
-            print(f"fitness: {self.fitness} - penalized")
-        else:
-            print(f"fitness: {self.fitness}")
+        # if self.collided_with_block or self.went_out_of_bounds or self.genome_completed:
+        #     print(f"fitness: {self.fitness} - penalized")
+        # else:
+        #     print(f"fitness: {self.fitness}")
 
     def mutate(self, mutation_rate):
         mutated_genome = []
