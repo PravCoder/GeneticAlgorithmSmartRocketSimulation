@@ -11,7 +11,7 @@ class Population:
         self.genome_length = 250
         self.create_population()
         self.parent_rockets = [] # selected rockets to create offspring of this generation
-        self.tournament_size = 50
+        self.tournament_size = 25
         self.genetion_num = 1
         self.mutation_rate = 0.05 
         # generation stats
@@ -93,7 +93,7 @@ class Population:
 
     def select_best_rockets_tournament_selection(self):
         self.parent_rockets = [] # make sure parent rockets is clear
-        for _ in range(self.num_individuals):  # iterate size of population which will also be the number of parent rockest
+        for _ in range(self.num_individuals):  # iterate size of population which will also be the number of parent rockets
             self.parent_rockets.append(self.tournament_selection())
 
     def single_point_crossover(self, parent1, parent2):
@@ -107,7 +107,7 @@ class Population:
     
     def tournament_selection(self):
         tournament = random.sample(self.chromosomes, self.tournament_size) # from the population of rockets select a subet of rockets (tournament-size)
-        tournament.sort(key=lambda rocket: rocket.fitness, reverse=True) # from teh randomly selected rocket sort them based on fitness and return the highest fitness rocket
+        tournament.sort(key=lambda rocket: rocket.fitness, reverse=True) # from the randomly selected rocket sort them based on fitness and return the highest fitness rocket
         return tournament[0]                                            # return the highest fitness of the selected sample
 
     def show_info(self, prin=True):
